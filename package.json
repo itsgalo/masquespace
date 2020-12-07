@@ -1,0 +1,10 @@
+{
+  "name": "masquespace",
+  "version": "0.0.1",
+  "description": "multi-player socket.io 3D app",
+  "dependencies": {
+    "bad-words": "^3.0.4",
+    "express": "^4.15.2",
+    "socket.io": "^2.2.0"
+  }
+}
