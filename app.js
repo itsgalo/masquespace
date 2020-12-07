@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+let PORT = process.env.PORT || 3000;
 
 app.use(express.static('./'));
 app.use(express.static('./libs'));
@@ -42,7 +43,7 @@ io.sockets.on('connection', function(socket){
 
 });
 
-http.listen(3000, function(){
+http.listen(PORT, function(){
   console.log('listening on *:3000');
 });
 
