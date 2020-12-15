@@ -7,10 +7,11 @@ class Game {
     this.renderer;
     this.terrain;
 
-    this.rays = new THREE.Vector3(0, 2, 0);;
+    this.rays = new THREE.Vector3(0, 0, 0);;
 		this.mouse = new THREE.Vector2();
 		this.raycaster = new THREE.Raycaster();
-		this.target = new THREE.Vector3(0, 2, 0);
+		this.target = new THREE.Vector3(0, 0, 0);
+    this.renderedTarget;
 
     this.remotePlayers = [];
 		this.remoteColliders = [];
@@ -18,6 +19,7 @@ class Game {
 		this.remoteData = [];
 
     this.clock = new THREE.Clock();
+    this.theta = 0;
 
     const game = this;
 
@@ -41,12 +43,15 @@ class Game {
 
   init() {
     let aspect = window.innerWidth / window.innerHeight;
-    this.camera = new THREE.OrthographicCamera( 120 * aspect / - 1.5, 120 * aspect / 1.5, 120 / 1.5, 120 / - 1.5, -120, 30000 );
-    //watch for this, too low creates raycasting issues too high and the text doesn't show.
-    this.camera.position.set( -100, 200, 100 );
+    let frustumSize = 250;
+    this.camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, -2000, 2000 );
+    //this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+    //watch for this, too low creates raycasting issues too high and the text doesn't show. normalize is important!
+    this.camera.position.set( -100, 100, 100 );
+    this.camera.updateProjectionMatrix();
 
 		this.scene = new THREE.Scene();
-		this.scene.background = new THREE.Color( 0xffffff );
+		//this.scene.background = new THREE.Color( 0xffffff );
 
 		const ambient = new THREE.AmbientLight( 0xaaaaaa );
     this.scene.add( ambient );
@@ -68,13 +73,14 @@ class Game {
 		this.sun = light;
 		this.scene.add(light);
 
-    // model
-		const game = this;
-		this.loadEnvironment(game.terrain);
-    this.player = new PlayerLocal(this);
+    const crosshair = new THREE.SphereBufferGeometry( 2, 32, 32 );
+    const crosshairMat = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+    const crosshairBox = new THREE.Mesh( crosshair, crosshairMat );
+    crosshairBox.position.set(this.rays.x, this.rays.y, this.rays.z);
+    this.renderedTarget = crosshairBox;
+    this.scene.add( crosshairBox );
 
 		this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
-		//this.renderer.setClearColor( 0xff0000, 0);
 		this.renderer.setPixelRatio( window.devicePixelRatio );
 		this.renderer.setSize( window.innerWidth, window.innerHeight );
 		this.renderer.shadowMap.enabled = true;
@@ -83,6 +89,11 @@ class Game {
 		this.controls = new THREE.OrbitControls( this.camera , this.renderer.domElement );
     //this.controls.enableZoom = false;
 		this.controls.enablePan = false;
+
+    // model
+		const game = this;
+		this.loadEnvironment(game.terrain);
+    this.player = new PlayerLocal(this);
 
 		//bind is important!
     this.renderer.domElement.addEventListener( 'touchstart', this.onTouch.bind(this), false );
@@ -99,13 +110,17 @@ class Game {
 		game.environment = object;
 		game.colliders = [];
     object.scene.scale.set(5,5,5);
+    //object.scene.position.set(0, -100, 0);
 		game.scene.add(object.scene);
     object.scene.traverse( function ( child ) {
       if ( child.isMesh ) {
           game.colliders.push(child);
-          child.material = new THREE.MeshLambertMaterial({color: 0x00eeff});
-          child.castShadow = true;
-          child.receiveShadow = true;
+          //child.geometry.computeFaceNormals();
+          //child.material = new THREE.MeshNormalMaterial();
+          //child.material = new THREE.MeshBasicMaterial({color: 0x000000});
+          child.material.side = THREE.FrontSide;
+          //child.castShadow = true;
+          //child.receiveShadow = true;
       }
       if ( child.isMesh ) {
         //game.terrainMixer = new THREE.AnimationMixer(object);
@@ -115,7 +130,12 @@ class Game {
 	}
 
   onWindowResize() {
-    this.camera.aspect = window.innerWidth / window.innerHeight;
+    const aspect = window.innerWidth / window.innerHeight;
+    let frustumSize = 200;
+		this.camera.left = - frustumSize * aspect / 2;
+		this.camera.right = frustumSize * aspect / 2;
+		this.camera.top = frustumSize / 2;
+		this.camera.bottom = - frustumSize / 2;
     this.camera.updateProjectionMatrix();
 
     this.renderer.setSize( window.innerWidth, window.innerHeight );
@@ -125,7 +145,7 @@ class Game {
 		event.preventDefault();
 		this.mouse.x = ( event.touches[0].pageX / window.innerWidth ) * 2 - 1 ;
     this.mouse.y = - ( event.touches[0].pageY / window.innerHeight ) * 2 + 1;
-		this.target = new THREE.Vector3(this.rays.x, 2, this.rays.z);
+		this.target = new THREE.Vector3(this.rays.x, this.rays.y, this.rays.z);
 		return false;
 	}
 	onPointerDown(event) {
@@ -136,12 +156,13 @@ class Game {
     return false;
 	}
 	onMouseUp() {
-		//this.mouseIsPressed = false;
+    //this.scene.add(new THREE.ArrowHelper( this.raycaster.ray.direction, this.rays, -100, Math.random() * 0xffffff ));
 	}
 	onMouseMove(event) {
     event.preventDefault();
     this.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	  this.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    this.renderedTarget.position.set(this.rays.x, this.rays.y, this.rays.z);
   }
 
   updateRemotePlayers(dt){
@@ -221,16 +242,19 @@ class Game {
       if (document.getElementById('chatText').value){
         this.player.msg = filter.clean(document.getElementById('chatText').value);
       } else {
-        this.player.msg = "";
+        this.player.msg = this.player.id;
       }
     }
+
     //handle raycasting
-    this.raycaster.setFromCamera( this.mouse, this.camera );
+    this.raycaster.setFromCamera(this.mouse, this.camera);
 		// calculate objects intersecting the picking ray
-		let intersects = this.raycaster.intersectObjects( this.scene.children, true );
-		for ( var i = 0; i < intersects.length; i++ ) {
-		  this.rays = intersects[i].point;
-		}
+		let intersects = this.raycaster.intersectObjects( this.colliders, true );
+    // must be [0] so that it's the first point to be intersected, not all the objects in the scene.
+    if (intersects.length != 0) {
+      this.rays = intersects[0].point;
+    }
+
     if (this.player.mixer!=undefined){
       this.player.mixer.update(dt);
     }
@@ -298,10 +322,11 @@ class Player {
       player.label = new THREE.TextSprite({
         alignment: 'left',
         //color: '#'+Math.floor(Math.random()*16777215).toString(16),
-        color: '#000000',
+        color: '#ffffff',
         fontFamily: '"FreePixel-Regular", sans-serif',
         fontSize: 5,
-        fontStyle: 'regular',
+        fontStyle: 'normal',
+        fontWeight: 'bold',
         text: player.msg
       });
       player.label.position.y = 20;

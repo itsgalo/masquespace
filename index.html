@@ -46,7 +46,7 @@
 				font-size: 50px;
 			}
 			h2 {
-				color: #000;
+				color: #fff;
 				text-align: center;
 				padding: 0px;
 				margin: 0px;
@@ -86,16 +86,20 @@
 				z-index: 100;
 				display:none;
 			}
-      input[type=text] {
-				border: 0;
+      input[type=text]{
 				padding: 5px;
 				width: 33%;
 				margin-right: .5%;
+				color: #fff;
 				font-family: "FreePixel-Regular", sans-serif;
 				font-size: 16px;
-				border: 2px solid black;
+				border: 2px dashed white;
   			border-radius: 4px;
 				text-align: center;
+				background-color: rgba(0, 0, 0, 0);
+			}
+			input:focus {
+				outline: none;
 			}
 		</style>
 	</head>
@@ -125,6 +129,8 @@
 				<br>desktop: right-click to move player, left-click and drag to orbit
 				<br>mobile: touch to move player, touch and drag to orbit
 				<br>send messages (up to 20 characters) using keyboard</p>
+				<p>
+					<br>disclaimer: this is a public space, please be kind to one another</p>
 		</div>
 		<div id="chat"><h2>say something nice</h2><br><input id="chatText" type="text" maxlength="20"></div>
 
