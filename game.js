@@ -272,7 +272,7 @@ class Player {
     color = [Math.random(), Math.random(), Math.random()];
     //check whether player has options, if not it is a new player
     if(options === undefined){
-      const models = ['player1', 'player2'];
+      const models = ['player1', 'player2', 'player3', 'player4', 'player5', 'player6', 'player7', 'player8', 'player9', 'player10'];
       model = models[Math.floor(Math.random()*models.length)];
     } else if (typeof options == 'object'){
       this.local = false;
@@ -329,7 +329,7 @@ class Player {
         fontWeight: 'bold',
         text: player.msg
       });
-      player.label.position.y = 20;
+      player.label.position.y = 30;
       player.object.add(player.label);
 
       if (player.deleted === undefined){
