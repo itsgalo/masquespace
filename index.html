@@ -5,13 +5,12 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<meta name="description" content="a place for virtual masques." />
-		<link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans|Kavivanar" rel="stylesheet">
 		<style>
 			@font-face {
-				font-family: "04b03";
+				font-family: "silka_monoregular";
 
-				src: url("./assets/04B03.woff") format("woff"), /* Modern Browsers */
-					url("./assets/04B03.woff2") format("woff2"); /* Modern Browsers */
+				src: url("./assets/silkamono-regular-webfont.ttf") format("truetype"), /* Modern Browsers */
+					url("./assets/silkamono-regular-webfont.woff2") format("woff2"); /* Modern Browsers */
 				font-weight: normal;
 				font-style: normal;
 			}
@@ -24,7 +23,7 @@
 			  font-style: normal;
 			}
 			body {
-				font-family: "FreePixel-Regular", monospace;
+				font-family: "silka_monoregular", monospace;
 				background: rgb(255,175,0);
 				background: radial-gradient(circle, rgba(249,135,94,1) 0%, rgba(240,160,204,1) 100%);
 				color: #ff0000;
@@ -43,7 +42,7 @@
 				color: #fff;
 				text-align: center;
 				padding: 25px 50px;
-				font-size: 50px;
+				font-size: 5vh;
 			}
 			h2 {
 				color: #fff;
@@ -56,13 +55,13 @@
 				color: #fff;
 				text-align: center;
 				padding: 10px;
-				font-size: 24px;
-				line-height: 30px;
+				font-size: 2vh;
+				line-height: 3vh;
 			}
 			button {
 				cursor: pointer;
 				position: relative;
-				font-family: "FreePixel-Regular", sans-serif;
+				font-family: "silka_monoregular", sans-serif;
 				background: none; /* Green */
   			border: none;
   			color: white;
@@ -91,7 +90,7 @@
 				width: 33%;
 				margin-right: .5%;
 				color: #fff;
-				font-family: "FreePixel-Regular", sans-serif;
+				font-family: "silka_monoregular", sans-serif;
 				font-size: 16px;
 				border: 2px dashed white;
   			border-radius: 4px;
@@ -124,7 +123,7 @@
 				document.getElementById('chat').style.display = "block";
 			};
 		</script>
-		<div id="modal"><h1>masque.space by office ca</h1><button onclick="startGame()">ENTER</button>
+		<div id="modal"><h1>masque.space by office ca <br>[beta]</h1><button onclick="startGame()"><h2>ENTER</h2></button>
 			<p>a place for multiplayer virtual masques
 				<br>desktop: right-click to move player, left-click and drag to orbit
 				<br>mobile: touch to move player, touch and drag to orbit
